@@ -22,6 +22,9 @@ export const createOrder = async (
 
     const { items, total, customerName, email, contactNumber, address } = req.body;
 
+    console.log('📦 Creating new order for:', customerName);
+    console.log('Order details:', { items: items.length, total, email });
+
     const order = await Order.create({
       items,
       total,
@@ -32,15 +35,15 @@ export const createOrder = async (
       status: 'pending',
     });
 
+    console.log('✅ Order created successfully:', order._id);
+
     res.status(201).json({
       success: true,
       message: 'Order created successfully',
-      data: {
-        order,
-      },
+      data: order,
     });
   } catch (error) {
-    console.error('Create order error:', error);
+    console.error('❌ Create order error:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating order',
@@ -56,24 +59,20 @@ export const getAllOrders = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log('📦 Fetching all orders...');
     const orders = await Order.find().sort({ createdAt: -1 });
+    console.log(`✅ Found ${orders.length} orders`);
 
     const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
     const totalProfit = totalSales * 0.4; // 40% profit margin
 
     res.status(200).json({
       success: true,
-      data: {
-        orders,
-        stats: {
-          totalOrders: orders.length,
-          totalSales,
-          totalProfit,
-        },
-      },
+      count: orders.length,
+      data: orders, // Return orders directly in data (not nested)
     });
   } catch (error) {
-    console.error('Get all orders error:', error);
+    console.error('❌ Get all orders error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching orders',

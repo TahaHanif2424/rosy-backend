@@ -22,8 +22,6 @@ export const createOrder = async (
 
     const { items, total, customerName, email, contactNumber, address } = req.body;
 
-    console.log('📦 Creating order:', { customerName, email, contactNumber, address, total, itemCount: items.length });
-
     const order = await Order.create({
       items,
       total,
@@ -33,8 +31,6 @@ export const createOrder = async (
       address,
       status: 'pending',
     });
-
-    console.log('✅ Order created successfully:', order._id);
 
     res.status(201).json({
       success: true,

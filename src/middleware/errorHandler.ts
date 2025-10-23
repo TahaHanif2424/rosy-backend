@@ -14,7 +14,7 @@ export const errorHandler = (
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 
-  console.error('❌ Error:', {
+  console.error('Error:', {
     message: err.message,
     stack: err.stack,
     statusCode,

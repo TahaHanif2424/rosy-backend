@@ -9,7 +9,7 @@ let isConnected = false;
 export const connectDatabase = async (): Promise<void> => {
   // If already connected, reuse the connection
   if (isConnected && mongoose.connection.readyState === 1) {
-    console.log('♻️  Using existing MongoDB connection');
+    console.log('Using existing MongoDB connection');
     return;
   }
 
@@ -33,10 +33,10 @@ export const connectDatabase = async (): Promise<void> => {
     await mongoose.connect(mongoURI, options);
 
     isConnected = true;
-    console.log('✅ MongoDB connected successfully');
-    console.log(`📊 Database: ${mongoose.connection.name}`);
+    console.log('MongoDB connected successfully');
+    console.log(`Database: ${mongoose.connection.name}`);
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
+    console.error('MongoDB connection error:', error);
     isConnected = false;
 
     // Don't exit in serverless environments, throw error instead
@@ -50,15 +50,15 @@ export const connectDatabase = async (): Promise<void> => {
 
 mongoose.connection.on('connected', () => {
   isConnected = true;
-  console.log('✅ MongoDB connection established');
+  console.log('MongoDB connection established');
 });
 
 mongoose.connection.on('disconnected', () => {
   isConnected = false;
-  console.log('⚠️  MongoDB disconnected');
+  console.log('MongoDB disconnected');
 });
 
 mongoose.connection.on('error', (error) => {
   isConnected = false;
-  console.error('❌ MongoDB error:', error);
+  console.error('MongoDB error:', error);
 });

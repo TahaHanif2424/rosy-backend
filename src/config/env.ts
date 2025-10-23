@@ -12,5 +12,5 @@ export const config = {
 
 // Validate required environment variables
 if (!process.env.JWT_SECRET && config.nodeEnv === 'production') {
-  console.warn('⚠️  WARNING: JWT_SECRET not set in production environment');
+  throw new Error('JWT_SECRET must be set in production environment');
 }

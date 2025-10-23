@@ -11,13 +11,7 @@ export const getAllCategories = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log('📁 GET /api/categories - Fetching all categories');
     const categories = await Category.find().sort({ createdAt: -1 });
-
-    console.log(`✅ Found ${categories.length} categories`);
-    if (categories.length > 0) {
-      console.log('📋 Categories:', categories.map(c => c.name));
-    }
 
     res.status(200).json({
       success: true,
@@ -25,7 +19,7 @@ export const getAllCategories = async (
       data: categories,
     });
   } catch (error) {
-    console.error('❌ Get all categories error:', error);
+    console.error('Get all categories error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching categories',

@@ -42,7 +42,6 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.log('❌ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -82,13 +81,13 @@ const startServer = async () => {
     await connectDatabase();
 
     app.listen(PORT, () => {
-      console.log('🚀 Server is running');
-      console.log(`📍 Port: ${PORT}`);
-      console.log(`🌍 Environment: ${config.nodeEnv}`);
-      console.log(`⏰ Started at: ${new Date().toLocaleString()}`);
+      console.log('Server is running');
+      console.log(`Port: ${PORT}`);
+      console.log(`Environment: ${config.nodeEnv}`);
+      console.log(`Started at: ${new Date().toLocaleString()}`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
 };

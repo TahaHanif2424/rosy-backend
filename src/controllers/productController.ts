@@ -11,23 +11,12 @@ export const getAllProducts = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log('📦 GET /api/products - Fetching all products');
     const { category } = req.query;
     const filter = category ? { category } : {};
-    console.log('🔍 Filter:', filter);
 
     const products = await Product.find(filter)
       .populate('category', 'name slug')
       .sort({ createdAt: -1 });
-
-    console.log(`✅ Found ${products.length} products`);
-    if (products.length > 0) {
-      console.log('📋 Sample product:', {
-        id: products[0]._id,
-        name: products[0].name,
-        category: products[0].category
-      });
-    }
 
     res.status(200).json({
       success: true,
@@ -35,7 +24,7 @@ export const getAllProducts = async (
       data: products,
     });
   } catch (error) {
-    console.error('❌ Get all products error:', error);
+    console.error('Get all products error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching products',
@@ -235,11 +224,9 @@ export const searchProducts = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log('🔍 SEARCH REQUEST - Query params:', req.query);
     const { q } = req.query;
 
     if (!q || typeof q !== 'string') {
-      console.log('⚠️ No search query provided');
       res.status(400).json({
         success: false,
         message: 'Search query is required',
@@ -247,11 +234,8 @@ export const searchProducts = async (
       return;
     }
 
-    console.log(`🔎 Searching for: "${q}"`);
-
     // Create a regex pattern that matches even a single word
     const searchRegex = new RegExp(q.trim(), 'i');
-    console.log('📝 Search regex:', searchRegex);
 
     // Search in product name, description, and category name
     const products = await Product.find({
@@ -263,8 +247,6 @@ export const searchProducts = async (
       .populate('category', 'name slug')
       .sort({ createdAt: -1 })
       .limit(20);
-
-    console.log(`📦 Found ${products.length} products by name/description`);
 
     // Also search by category name
     const categoryProducts = await Product.find()
@@ -280,8 +262,6 @@ export const searchProducts = async (
       (p) => p.category !== null
     );
 
-    console.log(`📂 Found ${matchedCategoryProducts.length} products by category`);
-
     // Combine results and remove duplicates
     const allProducts = [...products];
     matchedCategoryProducts.forEach((cp) => {
@@ -290,15 +270,13 @@ export const searchProducts = async (
       }
     });
 
-    console.log(`✅ Total unique products: ${allProducts.length}`);
-
     res.status(200).json({
       success: true,
       count: allProducts.length,
       data: allProducts.slice(0, 20),
     });
   } catch (error) {
-    console.error('❌ Search products error:', error);
+    console.error('Search products error:', error);
     res.status(500).json({
       success: false,
       message: 'Error searching products',

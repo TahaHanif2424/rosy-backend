@@ -25,7 +25,32 @@ const limiter = rateLimit({
 
 // Middleware
 app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
+
+// CORS Configuration - Allow frontend domains
+const allowedOrigins = [
+  'http://localhost:8080',                        // Local development
+  'http://localhost:5173',                        // Vite default port
+  'https://rosy-jewel-boutique.vercel.app',      // Production Vercel deployment
+  'https://rosy-backend-3.onrender.com',         // Backend URL (for testing)
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('❌ CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(limiter); // Apply rate limiting

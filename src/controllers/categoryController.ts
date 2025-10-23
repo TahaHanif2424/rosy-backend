@@ -11,7 +11,9 @@ export const getAllCategories = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log('📁 Fetching all categories...');
     const categories = await Category.find().sort({ createdAt: -1 });
+    console.log(`✅ Found ${categories.length} categories`);
 
     res.status(200).json({
       success: true,
@@ -19,7 +21,7 @@ export const getAllCategories = async (
       data: categories,
     });
   } catch (error) {
-    console.error('Get all categories error:', error);
+    console.error('❌ Get all categories error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching categories',

@@ -14,9 +14,14 @@ export const getAllProducts = async (
     const { category } = req.query;
     const filter = category ? { category } : {};
 
+    console.log('📦 Fetching all products...');
+    console.log('Filter:', filter);
+
     const products = await Product.find(filter)
       .populate('category', 'name slug')
       .sort({ createdAt: -1 });
+
+    console.log(`✅ Found ${products.length} products`);
 
     res.status(200).json({
       success: true,
@@ -24,7 +29,7 @@ export const getAllProducts = async (
       data: products,
     });
   } catch (error) {
-    console.error('Get all products error:', error);
+    console.error('❌ Get all products error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching products',

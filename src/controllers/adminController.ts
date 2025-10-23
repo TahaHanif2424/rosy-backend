@@ -21,33 +21,43 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     const { email, password } = req.body;
 
+    console.log('🔐 Admin login attempt:', email);
+
     // Find admin and include password
     const admin: any = await Admin.findOne({ email }).select('+password');
 
     if (!admin) {
+      console.log('❌ Admin not found:', email);
       res.status(401).json({
         success: false,
         message: 'Invalid email or password',
       });
       return;
     }
+
+    console.log('✅ Admin found:', admin.email);
 
     // Check password
     const isPasswordValid = await admin.comparePassword(password);
 
     if (!isPasswordValid) {
+      console.log('❌ Invalid password for:', email);
       res.status(401).json({
         success: false,
         message: 'Invalid email or password',
       });
       return;
     }
+
+    console.log('✅ Password valid, generating token...');
 
     // Generate token
     const token = generateToken({
       id: String(admin._id),
       email: admin.email,
     });
+
+    console.log('✅ Login successful for:', admin.name);
 
     res.status(200).json({
       success: true,
@@ -62,7 +72,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Login error:', error);
     res.status(500).json({
       success: false,
       message: 'Error logging in',

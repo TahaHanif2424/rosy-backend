@@ -81,8 +81,20 @@ export const createProduct = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log('🔧 CREATE PRODUCT - Start');
+    console.log('🔧 Request body:', JSON.stringify(req.body, null, 2));
+    console.log('🔧 Request body types:', {
+      name: typeof req.body.name,
+      category: typeof req.body.category,
+      price: typeof req.body.price,
+      image: typeof req.body.image,
+      description: typeof req.body.description,
+      inStock: typeof req.body.inStock,
+    });
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', JSON.stringify(errors.array(), null, 2));
       res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -91,28 +103,39 @@ export const createProduct = async (
       return;
     }
 
-    const { name, category, price, image, description } = req.body;
+    console.log('✅ Validation passed');
+    const { name, category, price, image, description, inStock } = req.body;
+    console.log('🔧 Extracted fields:', { name, category, price, image, description, inStock });
 
     // Verify category exists
+    console.log('🔧 Checking if category exists:', category);
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
+      console.log('❌ Category not found:', category);
       res.status(400).json({
         success: false,
         message: 'Invalid category ID',
       });
       return;
     }
+    console.log('✅ Category exists:', categoryExists.name);
 
-    const product = await Product.create({
+    const productData = {
       name,
       category,
       price,
       image,
       description,
-    });
+      inStock: inStock !== undefined ? inStock : true,
+    };
+    console.log('🔧 Creating product with data:', productData);
+
+    const product = await Product.create(productData);
+    console.log('✅ Product created:', product._id);
 
     // Populate category before sending response
     await product.populate('category', 'name slug');
+    console.log('✅ Product populated with category');
 
     res.status(201).json({
       success: true,
@@ -121,11 +144,14 @@ export const createProduct = async (
         product,
       },
     });
+    console.log('✅ Response sent successfully');
   } catch (error) {
-    console.error('Create product error:', error);
+    console.error('❌ Create product error:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     res.status(500).json({
       success: false,
       message: 'Error creating product',
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -148,7 +174,7 @@ export const updateProduct = async (
       return;
     }
 
-    const { name, category, price, image, description } = req.body;
+    const { name, category, price, image, description, inStock } = req.body;
 
     // Verify category exists
     const categoryExists = await Category.findById(category);
@@ -160,9 +186,14 @@ export const updateProduct = async (
       return;
     }
 
+    const updateData: any = { name, category, price, image, description };
+    if (inStock !== undefined) {
+      updateData.inStock = inStock;
+    }
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { name, category, price, image, description },
+      updateData,
       { new: true, runValidators: true }
     ).populate('category', 'name slug');
 

@@ -8,6 +8,9 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || 'default-secret-change-in-production',
   jwtExpire: process.env.JWT_EXPIRE || '7d',
   nodeEnv: process.env.NODE_ENV || 'development',
+  allowedOrigins: process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+    : ['http://localhost:8080', 'http://localhost:5173'],
 };
 
 // Validate required environment variables

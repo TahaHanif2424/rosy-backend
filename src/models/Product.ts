@@ -4,8 +4,9 @@ export interface IProduct extends Document {
   name: string;
   category: mongoose.Types.ObjectId;
   price: number;
-  image: string;
+  image: string | string[];
   description: string;
+  inStock: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,13 +30,26 @@ const productSchema = new Schema<IProduct>(
       min: [0, 'Price cannot be negative'],
     },
     image: {
-      type: String,
+      type: Schema.Types.Mixed,
       required: [true, 'Product image is required'],
+      validate: {
+        validator: function(v: any) {
+          // Accept both string and array of strings
+          if (typeof v === 'string') return v.length > 0;
+          if (Array.isArray(v)) return v.length > 0 && v.every(item => typeof item === 'string');
+          return false;
+        },
+        message: 'Image must be a valid URL string or array of URL strings'
+      }
     },
     description: {
       type: String,
-      required: [true, 'Description is required'],
+      required: false,
       maxlength: [500, 'Description cannot exceed 500 characters'],
+    },
+    inStock: {
+      type: Boolean,
+      default: true,
     },
   },
   {

@@ -5,7 +5,7 @@ interface ICartItem {
   name: string;
   category: string;
   price: number;
-  image: string;
+  image: string | string[]; // Support both single image and array of images
   description: string;
   quantity: number;
 }
@@ -42,8 +42,17 @@ const cartItemSchema = new Schema<ICartItem>(
       min: 0,
     },
     image: {
-      type: String,
+      type: Schema.Types.Mixed, // Accept both string and array of strings
       required: true,
+      validate: {
+        validator: function (value: any) {
+          // Accept both string and array of strings
+          if (typeof value === 'string' && value.length > 0) return true;
+          if (Array.isArray(value) && value.length > 0 && value.every((item: any) => typeof item === 'string')) return true;
+          return false;
+        },
+        message: 'Image must be a valid URL string or array of URL strings',
+      },
     },
     description: {
       type: String,

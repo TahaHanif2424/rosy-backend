@@ -25,6 +25,14 @@ const createOrderValidation = [
   body('items.*.quantity')
     .isInt({ min: 1 })
     .withMessage('Item quantity must be at least 1'),
+  body('items.*.image')
+    .custom((value) => {
+      // Accept both string and array of strings
+      if (typeof value === 'string' && value.length > 0) return true;
+      if (Array.isArray(value) && value.length > 0 && value.every((item: any) => typeof item === 'string')) return true;
+      throw new Error('Image must be a valid URL string or array of URL strings');
+    }),
+  body('items.*.description').notEmpty().withMessage('Item description is required'),
   body('total')
     .isFloat({ min: 0 })
     .withMessage('Total must be a positive number'),
@@ -43,6 +51,10 @@ const createOrderValidation = [
     .trim()
     .notEmpty()
     .withMessage('Contact number is required'),
+  body('address')
+    .trim()
+    .notEmpty()
+    .withMessage('Address is required'),
 ];
 
 // Routes

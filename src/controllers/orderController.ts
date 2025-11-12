@@ -10,8 +10,12 @@ export const createOrder = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log('📦 Order creation request received');
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation failed:', errors.array());
       res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -23,7 +27,7 @@ export const createOrder = async (
     const { items, total, customerName, email, contactNumber, address } = req.body;
 
     console.log('📦 Creating new order for:', customerName);
-    console.log('Order details:', { items: items.length, total, email });
+    console.log('Order details:', { itemsCount: items.length, total, email, address });
 
     const order = await Order.create({
       items,
@@ -44,9 +48,14 @@ export const createOrder = async (
     });
   } catch (error) {
     console.error('❌ Create order error:', error);
+    console.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
+    if (error instanceof Error && 'errors' in error) {
+      console.error('Validation errors:', (error as any).errors);
+    }
     res.status(500).json({
       success: false,
       message: 'Error creating order',
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };

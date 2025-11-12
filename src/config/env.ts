@@ -14,6 +14,7 @@ export const config = {
         'http://localhost:8080',
         'http://localhost:5173',
         'https://prettypickedbyshiza.com',
+        'https://www.prettypickedbyshiza.com',
         'http://prettypickedbyshiza.com',
         'https://admin.prettypickedbyshiza.com',
         'http://admin.prettypickedbyshiza.com'
